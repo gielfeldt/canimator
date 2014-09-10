@@ -1,8 +1,6 @@
 
 
 Vehicle = (function() {
-  var $parent = EasyOOP;
-
   // console.log("DECLARING Vehicle");
   var $this = function (options) {
     console.log("Construct Vehicle");
@@ -12,7 +10,7 @@ Vehicle = (function() {
     });
   };
 
-  EasyOOP.extend($parent, $this, {
+  EasyOOP.extend(null, $this, {
     show: function() {
       console.log(this.hasEngine + ", " + this.hasWheels);
     }
