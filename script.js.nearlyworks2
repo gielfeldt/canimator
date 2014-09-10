@@ -1,0 +1,285 @@
+// This is a constructor that is used to setup inheritance without
+// invoking the base's constructor. It does nothing, so it doesn't
+// create properties on the prototype like our previous example did
+function surrogateCtor() {}
+
+function extend(base, sub, methods) {
+  // console.log(methods);
+  surrogateCtor.prototype = base.prototype;
+  sub.prototype = new surrogateCtor();
+  sub.prototype.constructor = sub;
+  // Add a reference to the parent's prototype
+  sub.base = base.prototype;
+
+  // Copy the methods passed in to the prototype
+  for (var name in methods) {
+    // console.log("Copying: " + name);
+    if (typeof methods[name] == "function") {
+      sub.prototype[name] = methods[name];
+    }
+    else {
+      sub[name] = methods[name];
+    }
+  }
+  // console.log(sub.margin);
+  // so we can define the constructor inline
+  return sub;
+}
+
+function RGB2Color(r,g,b) {
+  return '#' + byte2Hex(r) + byte2Hex(g) + byte2Hex(b);
+}
+
+function byte2Hex(n)
+{
+  var nybHexString = "0123456789ABCDEF";
+  return String(nybHexString.substr((n >> 4) & 0x0F,1)) + nybHexString.substr(n & 0x0F,1);
+}
+
+var globalID;
+
+var animations = {};
+
+function animateBase(options) {
+  console.log(options);
+  var id = animateBase.globalId++;
+  for (var name in options) {
+    this[name] = options[name];
+  }
+  this.context = this.canvas.getContext("2d");
+  this.id = this.weight * 1000 + id;
+};
+
+animateBase.globalId = 0;
+
+animateBase.prototype = {
+  weight: 0,
+  canvas: null,
+  id: 0,
+  onEndCallbacks: [],
+  start: function() {
+    // console.log("start");
+    // console.log(this);
+    this.init();
+    animations[this.id] = this;
+  },
+
+  stop: function() {
+    // console.log("stop");
+    // console.log(this);
+    delete(animations[this.id]);
+    // console.log(this.onEndCallbacks);
+    $.each(this.onEndCallbacks, function(key, value) {
+      value();
+    });
+  },
+
+  resume: function() {
+    // console.log("resume");
+    // console.log(this);
+    animations[this.id] = this;
+  },
+
+  init: function() {},
+
+  animate: function() {},
+
+  onEnd: function(callback) {
+    this.onEndCallbacks.push(callback);
+  }
+};
+
+animateFadein = (function(){
+  var parent = animateBase;
+
+  // $this refers to the constructor
+  var $this = function (options) {
+    parent.call(this, options);
+    this.color = 0;
+  };
+
+  extend(parent, $this, {
+    init: function() {
+      // console.log("init animation");
+      this.color = 255;
+    },
+    animate: function() {
+      color = ("0" + this.color.toString(16)).substr(-2);
+      color = '#' + color + color + color;
+      // this.element.style.background = color;
+      this.context.fillStyle = "rgba(255, 255, 255, " + (this.color / 255) + ")";
+      this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      this.color -= 2;
+      if (this.color <= 0) {
+        this.stop();
+      }
+    }
+  });
+
+  return $this;
+})();
+
+starField = (function() {
+  var parent = animateBase;
+
+  // $this refers to the constructor
+  var $this = function (options) {
+    // console.log(options);
+    this.numstars = 0;
+    this.stars = [];
+    this.dx = 0;
+    this.dy = 0;
+    this.starsize = 0;
+    this.margin = 0;
+
+    parent.call(this, options);
+  };
+
+  extend(parent, $this, {
+    init: function() {
+      this.stars = [];
+      for (var i = 0; i < this.numstars; i++) {
+        this.stars[i] = [Math.random() * (this.canvas.width - this.margin * 2) + this.margin, Math.random() * (this.canvas.height - this.margin * 2) + this.margin];
+      }
+    },
+    animate: function() {
+      // this.context.fillStyle = RGB2Color(255, 255, 255);
+      this.context.fillStyle = "rgb(255, 255, 255)";
+      for (var i = 0; i < this.numstars; i++) {
+        this.stars[i][0] += this.dx;
+        // this.stars[i][1] += this.dy;
+        if (this.stars[i][0] < this.margin) {
+          this.stars[i][0] += (this.canvas.width - this.margin * 2);
+          // this.stars[i][1] = Math.random() * (this.canvas.height - this.margin * 2) + this.margin;
+        }
+        this.context.fillRect(this.stars[i][0], this.stars[i][1], this.starsize, this.starsize);
+      }
+      // this.stop();
+      // buffer.drawImage(this.canvas, 0, 0);
+    }
+  });
+
+  return $this;
+})();
+
+
+rasterBorder = (function() {
+  var parent = animateBase;
+
+  // $this refers to the constructor
+  var $this = function (options) {    
+    // console.log(options);
+    this.canvas = null;
+    this.clut = [];
+    this.margin = 32;
+    this.barsize = 1;
+    this.steps = 32;
+
+    parent.call(this, options);
+
+    var frequency = Math.PI * 2 / this.steps;
+    for (var i = 0; i < Math.PI * 2; i = i + frequency) {
+       red   = Math.sin(i + 0) * 127 + 128;
+       green = Math.sin(i + 2 * Math.PI * 2 / 3) * 127 + 128;
+       blue  = Math.sin(i + 4 * Math.PI * 2 / 3) * 127 + 128;
+
+       // document.write( '<font color="' + RGB2Color(red,green,blue) + '">&#9608;</font>');
+       this.clut.push(RGB2Color(red,green,blue));
+    }
+
+  };
+
+  extend(parent, $this, {
+    animate: function() {
+      for (i = 0; i < this.margin; i += this.barsize) {
+        color = Math.floor((Math.random() * this.steps));
+        this.context.fillStyle = this.clut[color];
+        this.context.fillRect(0, i, this.canvas.width, this.barsize);
+      }
+      for (i = this.margin; i < this.canvas.height - this.margin; i += this.barsize) {
+        color = Math.floor((Math.random()*this.steps));
+        this.context.fillStyle = this.clut[color];
+        this.context.fillRect(0, i, this.margin, this.barsize);
+      }
+      this.context.drawImage(this.canvas, 0, 0, this.canvas.width, this.margin, 0, this.canvas.height - this.margin, this.canvas.width, this.margin);
+      this.context.drawImage(this.canvas, 0, this.margin, this.margin, (this.canvas.height - this.margin * 2), this.canvas.width - this.margin, this.margin, this.margin, (this.canvas.height - this.margin * 2));
+    }
+  });
+
+  return $this;
+})();
+
+
+function repeatOften() {
+  mainscreenContext.clearRect(0, 0, mainscreen.width, mainscreen.height);
+  bufferContext.clearRect(0, 0, buffer.width, buffer.height);
+  $.each(animations, function() {
+    this.animate();
+  });
+  mainscreenContext.drawImage(buffer, 0, 0, buffer.width, buffer.height, 0, 0, mainscreen.width, mainscreen.height);
+  globalID = requestAnimationFrame(repeatOften);
+}
+
+var myFader;
+var starfield = [];
+var mainscreen;
+var buffer;
+var bufferContext;
+var mainscreenContext;
+
+$().ready(function() {
+  // document.getElementById("mainscreen").style.background = "#0000ff";
+  mainscreen = document.getElementById("mainscreen");
+  console.log(mainscreen);
+  mainscreen.width = $("#mainscreen").width();
+  mainscreen.height = $("#mainscreen").height();
+  mainscreenContext = mainscreen.getContext("2d");
+
+  buffer = document.createElement("canvas");
+  bufferContext = buffer.getContext("2d");
+  buffer.width = 320;
+  buffer.height = 240;
+
+  globalID = requestAnimationFrame(repeatOften);
+
+  myFader = new animateFadein({
+    canvas: buffer,
+    weight: 1
+  });
+  for (var i = 1; i <= 3; i++) {
+    starfield[i] = new starField({
+      canvas: buffer,
+      numstars: 100,
+      starsize: i,
+      dx: -0.5 * i,
+      margin: 32,
+    });
+  }
+
+  myRaster = new rasterBorder({canvas: buffer});
+
+  myFader.onEnd(function() {
+    myRaster.start();
+  });
+
+  // console.log(starfield);
+
+  $("#start").on("click", function() {
+    myFader.start();
+    // myRaster.start();
+  });
+
+  $("#stop").on("click", function() {
+    myFader.stop();
+  });
+
+  $("#resume").on("click", function() {
+    myFader.resume();
+  });
+
+  $("#test").on("click", function() {
+    starfield[1].start();
+    starfield[2].start();
+    starfield[3].start();
+  });
+});

@@ -1,0 +1,17 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+}
+
+#screen1,
+#screen2,
+#screen3,
+#screen4,
+#screen5,
+#screen6 {
+  position: absolute;
+  width:100%;
+  height:100%;
+  background-color: transparent;
+}

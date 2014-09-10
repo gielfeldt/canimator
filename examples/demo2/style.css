@@ -1,0 +1,36 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+#mainscreen_dev {
+  /**/
+  position: absolute;
+  top: 100px;
+  /**/
+  width:640px;
+  height:360px;
+  background-color: red;
+}
+
+button {
+  display: none;
+}
+
+#mainscreen_full {
+  position: absolute;
+  width:100%;
+  height:100%;
+  background-color: black;
+}
+
+#mainscreen {
+  width:640px;
+  height:360px;
+  background-color: black;
+}
+#mainscreen2 {
+  width:640px;
+  height:360px;
+  background-color: black;
+}
