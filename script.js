@@ -7,21 +7,37 @@ $().ready(function() {
   });
 
   timeTrigger.add({
-    1:    function() { myFader.start(); },
-    2:    function() { myFader.start(); },
-    3:    function() { myFader.start(); },
-    4:    function() { myFader.start(); },
-    5:    function() { myFader.start(); },
-    10.2: function() { myFader.start(); },
+    1:    function () { myFader.start(); },
+    2:    function () { myFader.start(); },
+    3:    function () { myFader.start(); },
+    4:    function () { myFader.start(); },
+    5:    function () { myFader.start(); },
+    10.2: function () { myFader.start(); },
   });
 
   timeTrigger.enable();
 
+  var buffer = document.createElement("canvas");
+  buffer.width = 640;
+  buffer.height = 360;
+
   // Create an animate object with our canvas.
   var animator = new cAnimator({
+    canvas: buffer,
+    width: buffer.width,
+    height: buffer.height,
+  });
+
+  // Create an animate object with our canvas.
+  var animator2 = new cAnimator({
     canvas: document.getElementById("mainscreen"),
-    width: 848,
-    height: 480,
+    pre: function () { 
+      this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      // this.canvasCtx.drawImage(buffer, 0, 0, buffer.width, buffer.height, 0, 0, this.canvas.width / 2, this.canvas.height / 2) 
+      this.canvasCtx.drawImage(buffer, 0, 0);
+    },
+    width: buffer.width,
+    height: buffer.height,
   });
 
   // Create a fadeIn animation on that animate object.
@@ -50,7 +66,6 @@ $().ready(function() {
   // Create a fadeIn animation on that animate object.
   var myRaster = new cAnimationRasterBorder({
     animator: animator,
-    margin: 32,
   });
 
   // Create 3 star field animations on that animate object.
@@ -58,10 +73,10 @@ $().ready(function() {
   for (var i = 1; i <= 3; i++) {
     starfield[i] = new cAnimationStarField({
       animator: animator,
-      numstars: 8000 / (i * 8),
-      starsize: i / 1.5,
+      numstars: 400 / i,
+      starsize: (i / 1.5) * buffer.height / 360,
       dx: -0.5 * i,
-      margin: 32,
+      margin: myRaster.margin,
     });
   }
 
@@ -70,30 +85,30 @@ $().ready(function() {
 //  var myText = new textScroll({
     animator: animator,
     text: "The most awesomest cAnimator framework! Out now! Peace!",
-    margin: 32,
-    quality: 3,
+    margin: myRaster.margin,
+    quality: 2,
   });
 
   // Start the whole sha-bang.
-  myFader2.onStart(function() {
+  myFader2.onStart(function () {
     document.getElementById('music').play();
     myRaster.start();
     starfield[1].start();
     starfield[2].start();
     starfield[3].start();
   });
-  myFader2.onStop(function() {
+  myFader2.onStop(function () {
     myFader3.start();
   });
-  myFader3.onStop(function() {
+  myFader3.onStop(function () {
     myFader.start();
     // myText.start();
   });
-  myFader.onStop(function() {
+  myFader.onStop(function () {
     myText.start();
   });
 
-  $(window).keypress(function(e) {
+  $(window).keypress(function (e) {
    var charCode = (e.which) ? e.which : e.keyCode
    var charValue = String.fromCharCode(charCode);
 
@@ -146,11 +161,11 @@ $().ready(function() {
 
     if (charValue == "f") {
       console.log("fps");
-      if (animator.fps) {
-        animator.showFPS(false);
+      if (animator2.fps) {
+        animator2.showFPS(false);
       }
       else {
-        animator.showFPS(30);
+        animator2.showFPS(30);
       }
     }
 
