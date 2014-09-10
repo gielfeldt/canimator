@@ -17,27 +17,11 @@ $().ready(function() {
 
   timeTrigger.enable();
 
-  var buffer = document.createElement("canvas");
-  buffer.width = 640;
-  buffer.height = 360;
-
   // Create an animate object with our canvas.
   var animator = new cAnimator({
-    canvas: buffer,
-    width: buffer.width,
-    height: buffer.height,
-  });
-
-  // Create an animate object with our canvas.
-  var animator2 = new cAnimator({
     canvas: document.getElementById("mainscreen"),
-    pre: function () { 
-      this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      // this.canvasCtx.drawImage(buffer, 0, 0, buffer.width, buffer.height, 0, 0, this.canvas.width / 2, this.canvas.height / 2) 
-      this.canvasCtx.drawImage(buffer, 0, 0);
-    },
-    width: buffer.width,
-    height: buffer.height,
+    width: 640,
+    height: 360,
   });
 
   // Create a fadeIn animation on that animate object.
@@ -74,12 +58,43 @@ $().ready(function() {
     starfield[i] = new cAnimationStarField({
       animator: animator,
       numstars: 400 / i,
-      starsize: (i / 1.5) * buffer.height / 360,
+      starsize: (i / 1.5) * animator.height / 360,
       dx: -0.5 * i,
       margin: myRaster.margin,
     });
   }
 
+  var sineLUT = [];
+  for (var i = 0; i < 1000; i++) {
+    sineLUT[i] = Math.sin((i / 1000) * Math.PI * 2);
+  }
+
+  var sine = [];
+  sine[0] = function(x) {
+    // x = Math.abs((this.x - x) % this.scrollWidth);
+    x = (this.x) % this.scrollWidth;
+    // x = (this.x - x) % this.buffer.width;
+    // console.log(x);
+    // return Math.sin((x / this.scrollWidth) * Math.PI * 2) * this.sineSettings.amplitude;
+    return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
+  }
+
+  sine[1] = function(x) {
+    x %= this.scrollWidth;
+    return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
+  }
+
+  sine[2] = function(x) {
+    x = (x + this.x * 3) % this.scrollWidth;
+    return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
+  }
+
+  sine[3] = function(x) {
+    x = (x * 3) % this.scrollWidth;
+    return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
+  }
+
+  var sinePos = 0;
   // Create text scroll animation on that animate object.
   var myText = new cAnimationSinusText({
 //  var myText = new textScroll({
@@ -87,11 +102,12 @@ $().ready(function() {
     text: "The most awesomest cAnimator framework! Out now! Peace!",
     margin: myRaster.margin,
     quality: 2,
+    sine: sine[sinePos],
   });
 
   // Start the whole sha-bang.
   myFader2.onStart(function () {
-    document.getElementById('music').play();
+    // document.getElementById('music').play();
     myRaster.start();
     starfield[1].start();
     starfield[2].start();
@@ -154,6 +170,11 @@ $().ready(function() {
       starfield[3].state === "stopped" ? starfield[3].start() : starfield[3].stop();
     }
 
+    if (charValue == "e") {
+      sinePos = (sinePos + 1) % sine.length;
+      myText.sine = sine[sinePos];
+    }
+
     if (charValue == "s") {
       console.log("stop/start text");
       myText.state === "stopped" ? myText.start() : myText.stop();
@@ -161,11 +182,11 @@ $().ready(function() {
 
     if (charValue == "f") {
       console.log("fps");
-      if (animator2.fps) {
-        animator2.showFPS(false);
+      if (animator.fps) {
+        animator.showFPS(false);
       }
       else {
-        animator2.showFPS(30);
+        animator.showFPS(30);
       }
     }
 
