@@ -51,7 +51,7 @@ $().ready(function() {
   var myFader2 = new cAnimationFadeIn({
     animator: animator,
     weight: 1,
-    color: "rgb(0, 0, 0)",
+    color: "rgba(0, 0, 0, [[opacity]])",
     speed: -0.01,
   });
 
