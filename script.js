@@ -7,27 +7,49 @@ $().ready(function() {
   });
 
   timeTrigger.add({
+    /*
     1:    function () { myFader.start(); },
     2:    function () { myFader.start(); },
     3:    function () { myFader.start(); },
     4:    function () { myFader.start(); },
     5:    function () { myFader.start(); },
+    */
     10.2: function () { myFader.start(); },
   });
 
   timeTrigger.enable();
+/*
+  // Create an animate object with our canvas.
+  var animator2 = new cAnimator({
+    canvas: document.getElementById("mainscreen"),
+    width: 848,
+    height: 480,
+    weight: 2,
+  });
+
+  var animator = new cAnimator({
+    canvas: document.createElement("canvas"),
+    width: animator2.width,
+    height: animator2.height,
+    pre: function () {
+      this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+      animator2.canvasCtx.drawImage(this.canvas, 0, 0)
+    },
+  });
+*/
 
   // Create an animate object with our canvas.
   var animator = new cAnimator({
     canvas: document.getElementById("mainscreen"),
-    width: 640,
-    height: 360,
+    width: 848,
+    height: 480,
+    weight: 2,
   });
 
   // Create a fadeIn animation on that animate object.
   var myFader = new cAnimationFadeIn({
     animator: animator,
-    weight: 1,
+    weight: 2,
     speed: -0.01,
   });
 
@@ -85,7 +107,8 @@ $().ready(function() {
   }
 
   sine[2] = function(x) {
-    x = (x + this.x * 3) % this.scrollWidth;
+    var x2 = sineLUT[parseInt((this.x % this.scrollWidth) / this.scrollWidth * 1000)] + 2;
+    x = (x + this.x * x2 * 0.5) % this.scrollWidth;
     return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
   }
 
@@ -94,27 +117,55 @@ $().ready(function() {
     return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
   }
 
-  var sinePos = 0;
+  sine[4] = function(x) {
+    x = (x + this.x) % this.scrollWidth;
+    return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
+  }
+
+  sine[5] = function(x) {
+    x = (x + this.x * 2) % this.scrollWidth;
+    return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
+  }
+
+  var sinePos = 5;
   // Create text scroll animation on that animate object.
   var myText = new cAnimationSinusText({
 //  var myText = new textScroll({
     animator: animator,
-    text: "The most awesomest cAnimator framework! Out now! Peace!",
+    text: "cAnimator! The most awesomest canvas animator framework available! Peace y'all!",
     margin: myRaster.margin,
-    quality: 2,
+    // quality: 4,
     sine: sine[sinePos],
+  });
+
+  // Create a fadeIn animation on that animate object.
+  var myBlur = new cAnimationBlur({
+    animator: animator,
+    strength: 2,
+    weight: 10,
+  });
+
+  // Create a fadeIn animation on that animate object.
+  var myInterlace = new cAnimationInterlace({
+    animator: animator,
+    weight: 20,
+    opacity: 0.3,
+    framesPerField: 3,
   });
 
   // Start the whole sha-bang.
   myFader2.onStart(function () {
-    // document.getElementById('music').play();
+    myBlur.start();
+    myInterlace.start();
     myRaster.start();
     starfield[1].start();
     starfield[2].start();
     starfield[3].start();
+    document.getElementById('music').play();
   });
   myFader2.onStop(function () {
-    myFader3.start();
+    // myFader3.start();
+    myText.start();
   });
   myFader3.onStop(function () {
     myFader.start();
@@ -122,6 +173,30 @@ $().ready(function() {
   });
   myFader.onStop(function () {
     myText.start();
+  });
+
+  var direction = 1;
+
+  myBlur.onStart(function () {
+    var id = setInterval(function() {
+      if (direction == -1) {
+        if (myBlur.strength > 0) {
+          myBlur.setStrength(myBlur.strength + direction);
+        }
+        else {
+          direction = 1;
+        }
+      }
+      else {
+        if (myBlur.strength < 100) {
+          myBlur.setStrength(myBlur.strength + direction);
+        }
+        else {
+          myBlur.stop();
+          clearInterval(id);
+        }
+      }
+    }, 100);
   });
 
   $(window).keypress(function (e) {
@@ -173,6 +248,13 @@ $().ready(function() {
     if (charValue == "e") {
       sinePos = (sinePos + 1) % sine.length;
       myText.sine = sine[sinePos];
+    }
+
+    if (charValue == "b") {
+      myBlur.state === "stopped" ? myBlur.start() : myBlur.stop();
+    }
+    if (charValue == "n") {
+      myInterlace.state === "stopped" ? myInterlace.start() : myInterlace.stop();
     }
 
     if (charValue == "s") {
