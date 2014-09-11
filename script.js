@@ -264,11 +264,11 @@ $().ready(function() {
 
     if (charValue == "f") {
       console.log("fps");
-      if (animator.fps) {
-        animator.showFPS(false);
+      if (animator.showStats()) {
+        animator.showStats(false);
       }
       else {
-        animator.showFPS(30);
+        animator.showStats(30);
       }
     }
 
