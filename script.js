@@ -1,6 +1,39 @@
 
 $().ready(function() {
 
+
+  // Create an animate object with our canvas.
+  var animator = new cAnimator({
+    canvas: document.getElementById("mainscreen"),
+    width: 1280,
+    height: 720,
+    weight: 2,
+  });
+
+  var myText = new cAnimationSinusText({
+//  var myText = new textScroll({
+    animator: animator,
+    text: "cAnimator! The most awesomest canvas animator framework available! Peace y'all!",
+    // margin: myRaster.margin,
+    // quality: 4,
+    // sine: sine[sinePos],
+    quality: 1,
+  });
+
+  myText.start();
+
+  HotKey.setChar("f", function() {
+    console.log("fps");
+    if (animator.showStats()) {
+      animator.showStats(false);
+    }
+    else {
+      animator.showStats(30);
+    }
+  });
+
+  return;
+
   var timeTrigger = new TimeTrigger({
     interval: 1000/30,
     callback: function() { return document.getElementById('music').currentTime; },
@@ -16,6 +49,7 @@ $().ready(function() {
     */
     10.2: function () { myFader.start(); },
   });
+
 
   timeTrigger.enable();
 /*
@@ -37,14 +71,6 @@ $().ready(function() {
     },
   });
 */
-
-  // Create an animate object with our canvas.
-  var animator = new cAnimator({
-    canvas: document.getElementById("mainscreen"),
-    width: 848,
-    height: 480,
-    weight: 2,
-  });
 
   // Create a fadeIn animation on that animate object.
   var myFader = new cAnimationFadeIn({
@@ -87,47 +113,87 @@ $().ready(function() {
   }
 
   var sineLUT = [];
-  for (var i = 0; i < 1000; i++) {
-    sineLUT[i] = Math.sin((i / 1000) * Math.PI * 2);
+  var sineLUTres = 640-32-32;
+  for (var i = 0; i < sineLUTres; i++) {
+    sineLUT[i] = Math.sin((i / sineLUTres) * Math.PI * 2);
   }
 
   var sine = [];
-  sine[0] = function(x) {
-    // x = Math.abs((this.x - x) % this.scrollWidth);
-    x = (this.x) % this.scrollWidth;
-    // x = (this.x - x) % this.buffer.width;
-    // console.log(x);
-    // return Math.sin((x / this.scrollWidth) * Math.PI * 2) * this.sineSettings.amplitude;
-    return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
+  sine[0] = {
+    callback: function(x) {
+      // x = Math.abs((this.x - x) % this.scrollWidth);
+      x = (this.x) % this.scrollWidth;
+      // x = (this.x - x) % this.buffer.width;
+      // console.log(x);
+      // return Math.sin((x / this.scrollWidth) * Math.PI * 2) * this.sineSettings.amplitude;
+      return sineLUT[Math.floor(x / this.scrollWidth * sineLUTres)] * this.amplitude;
+    }
   }
 
-  sine[1] = function(x) {
-    x %= this.scrollWidth;
-    return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
+  sine[1] = {
+    callback: function(x) {
+      x %= this.scrollWidth;
+      return sineLUT[Math.floor(x / this.scrollWidth * sineLUTres)] * this.amplitude;
+    }
   }
 
-  sine[2] = function(x) {
-    var x2 = sineLUT[parseInt((this.x % this.scrollWidth) / this.scrollWidth * 1000)] + 2;
-    x = (x + this.x * x2 * 0.5) % this.scrollWidth;
-    return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
+  sine[2] = {
+    callback: function(x) {
+      var x2 = sineLUT[Math.floor((this.x % this.scrollWidth) / this.scrollWidth * sineLUTres)] + 2;
+      x = (x + this.x * x2 * 0.5) % this.scrollWidth;
+      return sineLUT[Math.floor(x / this.scrollWidth * sineLUTres)] * this.amplitude;
+    }
   }
 
-  sine[3] = function(x) {
-    x = (x * 3) % this.scrollWidth;
-    return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
+  sine[3] = {
+    callback: function(x) {
+      x = (x * 3) % this.scrollWidth;
+      return sineLUT[Math.floor(x / this.scrollWidth * sineLUTres)] * this.amplitude;
+    }
   }
 
-  sine[4] = function(x) {
-    x = (x + this.x) % this.scrollWidth;
-    return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
+  sine[4] = {
+    callback: function(x) {
+      x = (x + this.x) % this.scrollWidth;
+      return sineLUT[Math.floor(x / this.scrollWidth * sineLUTres)] * this.amplitude;
+    }
   }
 
-  sine[5] = function(x) {
-    x = (x + this.x * 2) % this.scrollWidth;
-    return sineLUT[parseInt(x / this.scrollWidth * 1000)] * this.sineSettings.amplitude;
+  sine[5] = {
+    callback: function(x) {
+      x = (x + this.x * 2) % this.scrollWidth;
+      return sineLUT[Math.floor(x / this.scrollWidth * sineLUTres)] * this.amplitude;
+    }
   }
 
-  var sinePos = 5;
+  sine[6] = {
+    maxAmplitude: 80,
+    lastX: 0,
+    amplitudeSpeed: 1,
+    amplitude: 0,
+    callback: function(x) {
+      if (this.x != this.sine.lastX) {
+        this.sine.amplitude += this.sine.amplitudeSpeed;
+        if (this.sine.amplitude < -this.sine.maxAmplitude || this.sine.amplitude > this.sine.maxAmplitude) {
+          this.sine.amplitudeSpeed = -this.sine.amplitudeSpeed;
+        }
+        this.sine.lastX = this.x;
+        /*
+          var gradient = this.textBufferCtx.createLinearGradient(0,0,this.textWidth,0);
+          for (var i = 0; i < myRaster.steps; i++) {
+            gradient.addColorStop((Math.round(i + this.x / 100) % 32) / 31, myRaster.clut[i]);
+          }
+          this.textBufferCtx.fillStyle = gradient;
+          */
+          // this.textBufferCtx.fillText(this.text, this.scrollWidth, 0);
+
+      }
+      x = (x * 2 + this.x * 6) % this.scrollWidth;
+      return sineLUT[Math.floor(x / this.scrollWidth * sineLUTres)] * this.sine.amplitude;
+    }
+  }
+
+  var sinePos = 6;
   // Create text scroll animation on that animate object.
   var myText = new cAnimationSinusText({
 //  var myText = new textScroll({
@@ -136,7 +202,14 @@ $().ready(function() {
     margin: myRaster.margin,
     // quality: 4,
     sine: sine[sinePos],
+    quality: 1,
   });
+
+  myText.font.gradient = function(gradient) {
+    for (var i = 0; i < myRaster.steps; i++) {
+      gradient.addColorStop(i / 31, myRaster.clut[i]);
+    }
+  }
 
   // Create a fadeIn animation on that animate object.
   var myBlur = new cAnimationBlur({
@@ -175,26 +248,17 @@ $().ready(function() {
     myText.start();
   });
 
-  var direction = 1;
-
   myBlur.onStart(function () {
+    console.log("TEST");
     var id = setInterval(function() {
-      if (direction == -1) {
-        if (myBlur.strength > 0) {
-          myBlur.setStrength(myBlur.strength + direction);
-        }
-        else {
-          direction = 1;
-        }
+      if (myBlur.strength < 100) {
+        myBlur.setStrength(myBlur.strength * 1.2);
       }
       else {
-        if (myBlur.strength < 100) {
-          myBlur.setStrength(myBlur.strength + direction);
-        }
-        else {
-          myBlur.stop();
-          clearInterval(id);
-        }
+        console.log("NOBLUR");
+        myBlur.stop();
+        myBlur.setStrength(0);
+        clearInterval(id);
       }
     }, 100);
   });
