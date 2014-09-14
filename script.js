@@ -4,11 +4,6 @@ $().ready(function() {
 
   dancer = new Dancer();
   
-  var frequencies = [];
-  for (var i = 1000; i < 2000; i++) {
-    frequencies.push(i);
-  }
-
 /*
   kick = dancer.createKick({
     frequency: [7, 8],
@@ -284,17 +279,23 @@ $().ready(function() {
     framesPerField: 3,
   });
 
+  // Create a fadeIn animation on that animate object.
+  var myBlind = new cAnimationBlinds({
+    animator: animator,
+    weight: 15,
+  });
+
   // Start the whole sha-bang.
   myFader2.onStart(function () {
-    myBlur.start();
+    // myBlur.start();
     myInterlace.start();
     myRaster.start();
     starfield[1].start();
     starfield[2].start();
     starfield[3].start();
     // document.getElementById('music').play();
-    while (!dancer.isLoaded());
-    dancer.play();
+    //while (!dancer.isLoaded());
+    // dancer.play();
   });
   myFader2.onStop(function () {
     // myFader3.start();
@@ -376,7 +377,8 @@ $().ready(function() {
   });
   HotKey.setChar("s", function () {
     console.log("stop/start text");
-    myText.state === "stopped" ? myText.start() : myText.stop();
+    myText.state === "paused" ? myText.resume() : myText.pause();
+    // myText.state === "stopped" ? myText.start() : myText.stop();
   });
   HotKey.setChar("f", function () {
     console.log("fps");
@@ -386,6 +388,10 @@ $().ready(function() {
     else {
       animator.showStats(30);
     }
+  });
+  HotKey.setChar("g", function () {
+    // myFader.start();
+    myBlind.start();
   });
   HotKey.setChar("m", function () {
     console.log("stop/start music");
@@ -427,5 +433,7 @@ $().ready(function() {
     if (myBlur.strength > 50) myBlur.strength = 50;
     console.log(myBlur.strength);
   });
-    
+   
+
+  console.log("DONE"); 
 });
