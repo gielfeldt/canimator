@@ -2,14 +2,47 @@
 $().ready(function() {
 
 
+  dancer = new Dancer();
+  
+  var frequencies = [];
+  for (var i = 1000; i < 2000; i++) {
+    frequencies.push(i);
+  }
+
+/*
+  kick = dancer.createKick({
+    frequency: [7, 8],
+    threshold: 0.05,
+    onKick: function () {
+      console.log("Kicking");
+      myFader.start();
+    },
+    offKick: function () {
+      // console.log("Un-Kicking");
+    }
+  });
+*/
+  dancer.onceAt( 0, function () {
+    // kick.on();
+  }).onceAt( 10.2, function () {
+    myFader.start();
+  }).onceAt( 1, function () {
+    // dancer.pause();
+  })
+//    .fft( document.getElementById( 'fft' ) )
+    .load({ src: 'skidrow_fairlight', codecs: [ 'mp3' ]})
+  //  .load({ src: 'zircon_devils_spirit', codecs: [ 'mp3' ]})
+
+
+/*
   // Create an animate object with our canvas.
   var animator = new cAnimator({
     canvas: document.getElementById("mainscreen"),
-    width: 1280,
-    height: 720,
+    width: 848,
+    height: 480,
     weight: 2,
   });
-
+/*
   var myText = new cAnimationSinusText({
 //  var myText = new textScroll({
     animator: animator,
@@ -33,6 +66,7 @@ $().ready(function() {
   });
 
   return;
+*/
 
   var timeTrigger = new TimeTrigger({
     interval: 1000/30,
@@ -51,26 +85,38 @@ $().ready(function() {
   });
 
 
-  timeTrigger.enable();
+  // timeTrigger.enable();
 /*
   // Create an animate object with our canvas.
-  var animator2 = new cAnimator({
+  var realScreen = new cAnimator({
     canvas: document.getElementById("mainscreen"),
     width: 848,
     height: 480,
     weight: 2,
-  });
-
-  var animator = new cAnimator({
-    canvas: document.createElement("canvas"),
-    width: animator2.width,
-    height: animator2.height,
     pre: function () {
       this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-      animator2.canvasCtx.drawImage(this.canvas, 0, 0)
+      this.canvasCtx.drawImage(tempBuffer.canvas, 0, 0, tempBuffer.canvas.width, tempBuffer.canvas.height, 0, 0, this.canvas.width, this.canvas.height)
     },
   });
-*/
+
+  var tempBuffer = new cAnimator({
+    canvas: document.createElement("canvas"),
+    width: realScreen.width,
+    height: realScreen.height,
+  });
+
+  var animator = realScreen;
+  animator.pre = function () { this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height) }
+
+/**/
+  // Create an animate object with our canvas.
+  var animator = new cAnimator({
+    canvas: document.getElementById("mainscreen"),
+    width: 640,
+    height: 400,
+    weight: 2,
+  });
+  animator.start();
 
   // Create a fadeIn animation on that animate object.
   var myFader = new cAnimationFadeIn({
@@ -102,14 +148,20 @@ $().ready(function() {
 
   // Create 3 star field animations on that animate object.
   var starfield = [];
+  var dx = [];
   for (var i = 1; i <= 3; i++) {
+    dx[i] = 0.5 * i,
     starfield[i] = new cAnimationStarField({
       animator: animator,
       numstars: 400 / i,
       starsize: (i / 1.5) * animator.height / 360,
-      dx: -0.5 * i,
+      dx: dx[i],
       margin: myRaster.margin,
     });
+    starfield[i].preAnimate = function() {
+      this.parent().preAnimate();
+    }
+
   }
 
   var sineLUT = [];
@@ -188,8 +240,9 @@ $().ready(function() {
           // this.textBufferCtx.fillText(this.text, this.scrollWidth, 0);
 
       }
+      var posAmp = x / this.scrollWidth * 80;
       x = (x * 2 + this.x * 6) % this.scrollWidth;
-      return sineLUT[Math.floor(x / this.scrollWidth * sineLUTres)] * this.sine.amplitude;
+      return sineLUT[Math.floor(x / this.scrollWidth * sineLUTres)] * posAmp;
     }
   }
 
@@ -205,16 +258,20 @@ $().ready(function() {
     quality: 1,
   });
 
-  myText.font.gradient = function(gradient) {
+  myText.font.gradient = function(gradient, pos) {
+    console.log("POS: " + pos);
     for (var i = 0; i < myRaster.steps; i++) {
-      gradient.addColorStop(i / 31, myRaster.clut[i]);
+      // pos = (Math.floor(this.x / (this.textWidth + this.scrollWidth) * 31) + i) % 32;
+      gradient.addColorStop(i / 31, myRaster.clut[(pos + i) % 32]);
+      console.log((pos + i) % 32);
     }
   }
+  // myText.renderTextBuffer();
 
   // Create a fadeIn animation on that animate object.
-  var myBlur = new cAnimationBlur({
+  var myBlur = new cAnimationBlur2({
     animator: animator,
-    strength: 2,
+    strength: 0.2,
     weight: 10,
   });
 
@@ -223,6 +280,7 @@ $().ready(function() {
     animator: animator,
     weight: 20,
     opacity: 0.3,
+    // barsize: 10,
     framesPerField: 3,
   });
 
@@ -234,7 +292,9 @@ $().ready(function() {
     starfield[1].start();
     starfield[2].start();
     starfield[3].start();
-    document.getElementById('music').play();
+    // document.getElementById('music').play();
+    while (!dancer.isLoaded());
+    dancer.play();
   });
   myFader2.onStop(function () {
     // myFader3.start();
@@ -248,6 +308,7 @@ $().ready(function() {
     myText.start();
   });
 
+/*
   myBlur.onStart(function () {
     console.log("TEST");
     var id = setInterval(function() {
@@ -262,86 +323,109 @@ $().ready(function() {
       }
     }, 100);
   });
-
-  $(window).keypress(function (e) {
-   var charCode = (e.which) ? e.which : e.keyCode
-   var charValue = String.fromCharCode(charCode);
-
-    if (charValue == " ") {
-      console.log("FADER1");
-      myFader.start();
-    }
-    if (charCode == 13) {
-      console.log("FADER2");
-      myFader2.start();
-    }
-    if (charCode == 49) {
-      console.log("pause/play test");
-      myRaster.state === "paused" ? myRaster.resume() : myRaster.pause();
-    }
-    if (charCode == 50) {
-      console.log("pause/play test");
-      starfield[1].state === "paused" ? starfield[1].resume() : starfield[1].pause();
-    }
-    if (charCode == 51) {
-      console.log("pause/play test");
-      starfield[2].state === "paused" ? starfield[2].resume() : starfield[2].pause();
-    }
-    if (charCode == 52) {
-      console.log("pause/play test");
-      starfield[3].state === "paused" ? starfield[3].resume() : starfield[3].pause();
-    }
-
-    if (charCode == 53) {
-      console.log("stop/start test");
-      myRaster.state === "stopped" ? myRaster.start() : myRaster.stop();
-    }
-    if (charCode == 54) {
-      console.log("stop/start field1");
-      starfield[1].state === "stopped" ? starfield[1].start() : starfield[1].stop();
-    }
-    if (charCode == 55) {
-      console.log("stop/start field2");
-      starfield[2].state === "stopped" ? starfield[2].start() : starfield[2].stop();
-    }
-    if (charCode == 56) {
-      console.log("stop/start field3");
-      starfield[3].state === "stopped" ? starfield[3].start() : starfield[3].stop();
-    }
-
-    if (charValue == "e") {
-      sinePos = (sinePos + 1) % sine.length;
-      myText.sine = sine[sinePos];
-    }
-
-    if (charValue == "b") {
-      myBlur.state === "stopped" ? myBlur.start() : myBlur.stop();
-    }
-    if (charValue == "n") {
-      myInterlace.state === "stopped" ? myInterlace.start() : myInterlace.stop();
-    }
-
-    if (charValue == "s") {
-      console.log("stop/start text");
-      myText.state === "stopped" ? myText.start() : myText.stop();
-    }
-
-    if (charValue == "f") {
-      console.log("fps");
-      if (animator.showStats()) {
-        animator.showStats(false);
-      }
-      else {
-        animator.showStats(30);
-      }
-    }
-
-    if (charValue == "m") {
-      console.log("stop/start music");
-      var music = document.getElementById('music');
-      music.paused ? music.play() : music.pause();
-    }
-    
+*/
+  HotKey.setChar(" ", function () {
+    console.log("FADER1");
+    myFader.start();
   });
-
+  HotKey.setCode(13, function () {
+    console.log("FADER2");
+    myFader2.start();
+  });
+  HotKey.setChar("1", function () {
+    console.log("pause/play test");
+    myRaster.state === "paused" ? myRaster.resume() : myRaster.pause();
+  });
+  HotKey.setChar("2", function () {
+    console.log("pause/play test");
+    starfield[1].state === "paused" ? starfield[1].resume() : starfield[1].pause();
+  });
+  HotKey.setChar("3", function () {
+    console.log("pause/play test");
+    starfield[2].state === "paused" ? starfield[2].resume() : starfield[2].pause();
+  });
+  HotKey.setChar("4", function () {
+    console.log("pause/play test");
+    starfield[3].state === "paused" ? starfield[3].resume() : starfield[3].pause();
+  });
+  HotKey.setChar("5", function () {
+    console.log("stop/start test");
+    myRaster.state === "stopped" ? myRaster.start() : myRaster.stop();
+  });
+  HotKey.setChar("6", function () {
+    console.log("stop/start field1");
+    starfield[1].state === "stopped" ? starfield[1].start() : starfield[1].stop();
+  });
+  HotKey.setChar("7", function () {
+    console.log("stop/start field2");
+    starfield[2].state === "stopped" ? starfield[2].start() : starfield[2].stop();
+  });
+  HotKey.setChar("8", function () {
+    console.log("stop/start field3");
+    starfield[3].state === "stopped" ? starfield[3].start() : starfield[3].stop();
+  });
+  HotKey.setChar("e", function () {
+    sinePos = (sinePos + 1) % sine.length;
+    myText.sine = sine[sinePos];
+  });
+  HotKey.setChar("b", function () {
+    myBlur.state === "stopped" ? myBlur.start() : myBlur.stop();
+  });
+  HotKey.setChar("n", function () {
+    myInterlace.state === "stopped" ? myInterlace.start() : myInterlace.stop();
+  });
+  HotKey.setChar("s", function () {
+    console.log("stop/start text");
+    myText.state === "stopped" ? myText.start() : myText.stop();
+  });
+  HotKey.setChar("f", function () {
+    console.log("fps");
+    if (animator.showStats()) {
+      animator.showStats(false);
+    }
+    else {
+      animator.showStats(30);
+    }
+  });
+  HotKey.setChar("m", function () {
+    console.log("stop/start music");
+    dancer.isPlaying() ? dancer.pause() : dancer.play();
+    return;
+    var music = document.getElementById('music');
+    music.paused ? music.play() : music.pause();
+  });
+  HotKey.setChar("p", function () {
+    animator.isRunning() ? animator.stop() : animator.start();
+  });
+  HotKey.setChar("w", function () {
+    /*
+    var canvas = fx.canvas();
+    var texture = canvas.texture(document.getElementById("mainscreen"));
+    canvas.draw(texture).sepia(1).update();
+    */
+    var canvas = myText.textBuffer;
+    var scr = document.getElementById("mainscreen");
+    var ctx = scr.getContext("2d");
+    ctx.clearRect(0, 0, scr.width, scr.height);
+    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, scr.width, scr.height);
+  });
+  HotKey.setChar("-", function () {
+    myText.quality -= 1;
+    if (myText.quality < 1) myText.quality = 1;
+    console.log(myText.quality);
+    return;
+    myBlur.strength -= 0.05;
+    if (myBlur.strength < 0) myBlur.strength = 0;
+    console.log(myBlur.strength);
+  });
+  HotKey.setChar("+", function () {
+    myText.quality += 1;
+    if (myText.quality > 50) myText.quality = 50;
+    console.log(myText.quality);
+    return;
+    myBlur.strength += 0.05;
+    if (myBlur.strength > 50) myBlur.strength = 50;
+    console.log(myBlur.strength);
+  });
+    
 });

@@ -25,6 +25,15 @@ button {
   background-color: black;
 }
 
+#fft {
+  display: none;
+  position: absolute;
+  top:400px;
+  width:640px;
+  height:400px;
+  background-color: black;
+}
+
 #mainscreen_small {
   width:640px;
   height:360px;

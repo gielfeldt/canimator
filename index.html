@@ -1,6 +1,10 @@
 <html>
   <head>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://phoboslab.org/files/webgl-image-filter/webgl-image-filter.js?v3"></script>
+    <script src="/glfx.js"></script>
+    <script src="/glfx.js"></script>
+
     <script src="/lib/EasyOOP.js"></script>
     <script src="/lib/cAnimator.js"></script>
     <script src="/lib/TimeTrigger.js"></script>
@@ -15,6 +19,18 @@
     <script src="/lib/plugin/textScroll.js"></script>
     <script src="/lib/plugin/test.js"></script>
     -->
+
+    <!-- Dancer.js -->
+    <script src="dancer.js/src/dancer.js"></script>
+    <script src="dancer.js/src/support.js"></script>
+    <script src="dancer.js/src/kick.js"></script>
+    <script src="dancer.js/src/adapterWebAudio.js"></script>
+    <script src="dancer.js/src/adapterMoz.js"></script>
+    <script src="dancer.js/src/adapterFlash.js"></script>
+    <script src="dancer.js/lib/fft.js"></script>
+    <script src="dancer.js/lib/flash_detect.js"></script>
+    <script src="dancer.js/plugins/dancer.fft.js"></script>
+
     <script src="script.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
@@ -22,6 +38,7 @@
     <audio id="music">
       <source src="/skidrow_fairlight.mp3" />  
     </audio> 
+    <canvas id="fft"></canvas>
     <canvas id="mainscreen"></canvas>
   </body>
 </html>
