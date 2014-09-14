@@ -80,7 +80,7 @@ $().ready(function() {
   });
 
 
-  // timeTrigger.enable();
+  timeTrigger.enable();
 /*
   // Create an animate object with our canvas.
   var realScreen = new cAnimator({
@@ -395,8 +395,8 @@ $().ready(function() {
   });
   HotKey.setChar("m", function () {
     console.log("stop/start music");
-    dancer.isPlaying() ? dancer.pause() : dancer.play();
-    return;
+    // dancer.isPlaying() ? dancer.pause() : dancer.play();
+    // return;
     var music = document.getElementById('music');
     music.paused ? music.play() : music.pause();
   });
