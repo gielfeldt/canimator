@@ -285,6 +285,19 @@ $().ready(function() {
     weight: 15,
   });
 
+  // Create a fadeIn animation on that animate object.
+  var myStatic = new cAnimationStatic({
+    animator: animator,
+    weight: 13,
+  });
+  myStatic.onStart(function () {
+    document.getElementById('static').play();
+  });
+  myStatic.onStop(function () {
+    document.getElementById('static').pause();
+    document.getElementById('static').currentTime = 0;
+  });
+
   // Start the whole sha-bang.
   myFader2.onStart(function () {
     // myBlur.start();
@@ -390,8 +403,11 @@ $().ready(function() {
     }
   });
   HotKey.setChar("g", function () {
-    // myFader.start();
     myBlind.start();
+  });
+  HotKey.setChar("a", function () {
+    myStatic.duration = Math.floor(Math.random() * 1000);
+    myStatic.start();
   });
   HotKey.setChar("m", function () {
     console.log("stop/start music");
