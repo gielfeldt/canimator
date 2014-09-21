@@ -296,6 +296,13 @@ $().ready(function() {
     animator: animator,
     weight: 12,
   });
+
+  // Create a fadeIn animation on that animate object.
+  var mySkew = new cAnimationSkewArtifacts({
+    animator: animator,
+    weight: 25,
+  });
+
   myStatic.onStart(function () {
     document.getElementById('static').play();
   });
@@ -417,6 +424,9 @@ $().ready(function() {
   });
   HotKey.setChar("d", function () {
     myMpeg.state === "stopped" ? myMpeg.start() : myMpeg.stop();
+  });
+  HotKey.setChar("h", function () {
+    mySkew.state === "stopped" ? mySkew.start() : mySkew.stop();
   });
   HotKey.setChar("m", function () {
     console.log("stop/start music");
