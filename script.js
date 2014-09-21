@@ -156,8 +156,14 @@ $().ready(function() {
     starfield[i].preAnimate = function() {
       this.parent().preAnimate();
     }
-
   }
+
+  // Create a fadeIn animation on that animate object.
+  var myMpeg = new cAnimationMpegArtifacts({
+    animator: animator,
+    duration: 2,
+    weight: 14,
+  });
 
   var sineLUT = [];
   var sineLUTres = 640-32-32;
@@ -288,7 +294,7 @@ $().ready(function() {
   // Create a fadeIn animation on that animate object.
   var myStatic = new cAnimationStatic({
     animator: animator,
-    weight: 13,
+    weight: 12,
   });
   myStatic.onStart(function () {
     document.getElementById('static').play();
@@ -408,6 +414,9 @@ $().ready(function() {
   HotKey.setChar("a", function () {
     myStatic.duration = Math.floor(Math.random() * 1000);
     myStatic.start();
+  });
+  HotKey.setChar("d", function () {
+    myMpeg.state === "stopped" ? myMpeg.start() : myMpeg.stop();
   });
   HotKey.setChar("m", function () {
     console.log("stop/start music");
