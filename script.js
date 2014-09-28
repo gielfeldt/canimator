@@ -109,21 +109,22 @@ $().ready(function() {
     canvas: document.getElementById("mainscreen"),
     width: 640,
     height: 400,
-    weight: 2,
+    weight: 102,
   });
+  cAnimator.start();
   animator.start();
 
   // Create a fadeIn animation on that animate object.
   var myFader = new cAnimationFadeIn({
     animator: animator,
-    weight: 2,
+    weight: 102,
     speed: -0.01,
   });
 
   // Create a fadeIn animation on that animate object.
   var myFader2 = new cAnimationFadeIn({
     animator: animator,
-    weight: 1,
+    weight: 101,
     color: "rgba(0, 0, 0, [[opacity]])",
     speed: -0.01,
   });
@@ -131,7 +132,7 @@ $().ready(function() {
   // Create a fadeIn animation on that animate object.
   var myFader3 = new cAnimationFadeIn({
     animator: animator,
-    weight: 1,
+    weight: 101,
     alpha: [0, 1],
     speed: 0.01,
   });
@@ -158,11 +159,17 @@ $().ready(function() {
     }
   }
 
+  var myStar = new cAnimationStarField3D({
+    animator: animator,
+  });
+
+
+
   // Create a fadeIn animation on that animate object.
   var myMpeg = new cAnimationMpegArtifacts({
     animator: animator,
     duration: 2,
-    weight: 14,
+    weight: 114,
   });
 
   var sineLUT = [];
@@ -257,6 +264,7 @@ $().ready(function() {
     // quality: 4,
     sine: sine[sinePos],
     quality: 1,
+    //speed: 0.1,
   });
 
   myText.font.gradient = function(gradient, pos) {
@@ -270,39 +278,48 @@ $().ready(function() {
   // myText.renderTextBuffer();
 
   // Create a fadeIn animation on that animate object.
-  var myBlur = new cAnimationBlur2({
+  var myBlur = new cAnimationBlur({
     animator: animator,
     strength: 0.2,
-    weight: 10,
+    weight: 110,
   });
 
   // Create a fadeIn animation on that animate object.
   var myInterlace = new cAnimationInterlace({
     animator: animator,
-    weight: 20,
+    weight: 120,
     opacity: 0.3,
     // barsize: 10,
     framesPerField: 3,
   });
 
-  // Create a fadeIn animation on that animate object.
   var myBlind = new cAnimationBlinds({
     animator: animator,
-    weight: 15,
+    weight: 115,
   });
 
-  // Create a fadeIn animation on that animate object.
+/*
   var myStatic = new cAnimationStatic({
     animator: animator,
     weight: 12,
   });
-
-  // Create a fadeIn animation on that animate object.
+*/
   var mySkew = new cAnimationSkewArtifacts({
     animator: animator,
-    weight: 25,
+    weight: 125,
   });
 
+  var myRotate = new cAnimationRotate({
+    animator: animator,
+    weight: 125,
+  });
+
+
+  var myPlasma = new cAnimationPlasma({
+    animator: animator,
+  });
+
+/*
   myStatic.onStart(function () {
     document.getElementById('static').play();
   });
@@ -310,6 +327,7 @@ $().ready(function() {
     document.getElementById('static').pause();
     document.getElementById('static').currentTime = 0;
   });
+*/
 
   // Start the whole sha-bang.
   myFader2.onStart(function () {
@@ -398,6 +416,10 @@ $().ready(function() {
   HotKey.setChar("b", function () {
     myBlur.state === "stopped" ? myBlur.start() : myBlur.stop();
   });
+  HotKey.setChar("q", function () {
+    myPlasma.state === "stopped" ? myPlasma.start() : myPlasma.stop();
+    //myStar.state === "stopped" ? myStar.start() : myStar.stop();
+  });
   HotKey.setChar("n", function () {
     myInterlace.state === "stopped" ? myInterlace.start() : myInterlace.stop();
   });
@@ -427,6 +449,9 @@ $().ready(function() {
   });
   HotKey.setChar("h", function () {
     mySkew.state === "stopped" ? mySkew.start() : mySkew.stop();
+  });
+  HotKey.setChar("r", function () {
+    myRotate.state === "stopped" ? myRotate.start() : myRotate.stop();
   });
   HotKey.setChar("m", function () {
     console.log("stop/start music");

@@ -1,0 +1,42 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: gray;
+}
+
+#map, #mainscreen {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  padding: 0;
+  margin: 0;
+  background-color: red;
+}
+
+#map {
+  display: none;
+}
+#viewport {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0;
+  margin: 0;
+  width:100%;
+  height:100%;
+  background-color: black;
+  overflow: hidden;
+}
+
+
+#stats {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  padding: 0;
+  margin: 0;
+  width:640px;
+  height:400px;
+  background-color: transparent;
+  z-index: 100;
+}
