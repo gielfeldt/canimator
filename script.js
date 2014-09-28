@@ -298,12 +298,11 @@ $().ready(function() {
     weight: 115,
   });
 
-/*
   var myStatic = new cAnimationStatic({
     animator: animator,
     weight: 12,
   });
-*/
+
   var mySkew = new cAnimationSkewArtifacts({
     animator: animator,
     weight: 125,
@@ -319,7 +318,6 @@ $().ready(function() {
     animator: animator,
   });
 
-/*
   myStatic.onStart(function () {
     document.getElementById('static').play();
   });
@@ -327,7 +325,6 @@ $().ready(function() {
     document.getElementById('static').pause();
     document.getElementById('static').currentTime = 0;
   });
-*/
 
   // Start the whole sha-bang.
   myFader2.onStart(function () {
