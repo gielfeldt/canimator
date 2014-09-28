@@ -108,10 +108,10 @@ $().ready(function() {
   var myVRes = new cAnimationVRes({
     animator: animator,
     weight: 140,
-    factor: 0.2,
-    //width: 160,
+    //factor: 0.2,
+    width: 320,
     //height: 100,
-    smooth: false,
+    //smooth: false,
   });
 
 /**
@@ -132,6 +132,17 @@ $().ready(function() {
   }, 1000/30)
 /**/
 
+  var dir = -1
+  var spd = 1
+  setInterval(function() {
+    myVRes.setSize(myVRes.width + dir * spd, null)
+    if (Math.floor(myVRes.width) <= 0 || Math.floor(myVRes.width) >= myVRes.buffer.width) {
+      dir = -dir
+    }
+    else {
+      spd = myVRes.width / 20
+    }
+  }, 1000/30);
 
   myLevel.start();
   //myInterlace.start()
@@ -159,18 +170,21 @@ $().ready(function() {
   HotKey.setChar("r", function () {
     myVRes.state === "stopped" ? myVRes.start() : myVRes.stop();
   });
+  HotKey.setChar("R", function () {
+    myVRes.smooth = !myVRes.smooth
+  });
   HotKey.setChar("I", function () {
     myInterlace.frequency = myInterlace.frequency ? 0 : 60
   });
 
   HotKey.setChar("+", function () {
-    console.log(myVRes.factor);
-    myVRes.setFactor(myVRes.factor + 0.01)
+    console.log(myVRes.width + " x " + myVRes.height);
+    myVRes.setSize(myVRes.width + 1, null)
   });
 
   HotKey.setChar("-", function () {
-    console.log(myVRes.factor);
-    myVRes.setFactor(myVRes.factor - 0.01)
+    console.log(myVRes.width + " x " + myVRes.height);
+    myVRes.setSize(myVRes.width - 1, null)
   });
 
   HotKey.setChar("p", function () {
