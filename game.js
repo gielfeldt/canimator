@@ -29,8 +29,8 @@ $().ready(function() {
   // Create an animate object with our canvas.
   var animator = new cAnimator({
     canvas: mainscreen,
-    width: 640,
-    height: 400,
+    width: 1280,
+    height: 800,
     weight: 200,
     viewport: viewport,
     //maintainAspectRatio: false,
@@ -134,7 +134,9 @@ $().ready(function() {
 
   var dir = -1
   var spd = 1
+  var smoothAnimation = false
   setInterval(function() {
+    if (!smoothAnimation) return;
     myVRes.setSize(myVRes.width + dir * spd, null)
     if (Math.floor(myVRes.width) <= 0 || Math.floor(myVRes.width) >= myVRes.buffer.width) {
       dir = -dir
@@ -172,6 +174,9 @@ $().ready(function() {
   });
   HotKey.setChar("R", function () {
     myVRes.smooth = !myVRes.smooth
+  });
+  HotKey.setChar("A", function () {
+    smoothAnimation = !smoothAnimation
   });
   HotKey.setChar("I", function () {
     myInterlace.frequency = myInterlace.frequency ? 0 : 60

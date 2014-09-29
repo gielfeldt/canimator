@@ -107,8 +107,8 @@ $().ready(function() {
   // Create an animate object with our canvas.
   var animator = new cAnimator({
     canvas: document.getElementById("mainscreen"),
-    width: 640,
-    height: 400,
+    width: 960,
+    height: 600,
     weight: 102,
   });
   cAnimator.start();
@@ -287,7 +287,7 @@ $().ready(function() {
   // Create a fadeIn animation on that animate object.
   var myInterlace = new cAnimationInterlace({
     animator: animator,
-    weight: 120,
+    weight: 154,
     opacity: 0.3,
     // barsize: 10,
     framesPerField: 3,
@@ -310,7 +310,13 @@ $().ready(function() {
 
   var myRotate = new cAnimationRotate({
     animator: animator,
-    weight: 125,
+    weight: 155,
+  });
+
+  var myVRes = new cAnimationVRes({
+    animator: animator,
+    weight: 135,
+    factor: 0.2,
   });
 
 
@@ -349,6 +355,21 @@ $().ready(function() {
   myFader.onStop(function () {
     myText.start();
   });
+
+  var dir = -1
+  var spd = 1
+  var smoothAnimation = false
+  setInterval(function() {
+    if (!smoothAnimation) return;
+    myVRes.setSize(myVRes.width + dir * spd, null)
+    if (Math.floor(myVRes.width) <= 0 || Math.floor(myVRes.width) >= myVRes.buffer.width) {
+      dir = -dir
+    }
+    else {
+      spd = myVRes.width / 10
+    }
+  }, 1000/30);
+
 
 /*
   myBlur.onStart(function () {
@@ -450,6 +471,24 @@ $().ready(function() {
   HotKey.setChar("r", function () {
     myRotate.state === "stopped" ? myRotate.start() : myRotate.stop();
   });
+  HotKey.setChar("v", function () {
+    myVRes.state === "stopped" ? myVRes.start() : myVRes.stop();
+  });
+  HotKey.setChar("V", function () {
+    myVRes.smooth = !myVRes.smooth
+  });
+  HotKey.setChar("c", function () {
+    smoothAnimation = !smoothAnimation
+  });
+  HotKey.setChar("z", function () {
+    console.log(myVRes.width + " x " + myVRes.height);
+    myVRes.setSize(myVRes.width + 1, null)
+  });
+  HotKey.setChar("x", function () {
+    console.log(myVRes.width + " x " + myVRes.height);
+    myVRes.setSize(myVRes.width - 1, null)
+  });
+
   HotKey.setChar("m", function () {
     console.log("stop/start music");
     // dancer.isPlaying() ? dancer.pause() : dancer.play();
