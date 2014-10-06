@@ -83,9 +83,20 @@ $().ready(function() {
   }(mainscreen))();
 */
   // Create a fadeIn animation on that animate object.
-  var myLevel = new cAnimationLevel({
+  var myLevel = new cAnimationMap({
     animator: animator,
     weight: 0,
+    mapWidth: 6400,
+    mapHeight: 6400,
+    generateMap: function() {
+      for (var y = 0; y < this.map.height; y++) {
+        console.log("Line: " + y)
+        for (var x = 0; x < this.map.width; x++) {
+          this.mapCtx.fillStyle = "rgb(" + x + "," + y + "," + (x * y) + ")";
+          this.mapCtx.fillRect(x, y, 1, 1)
+        }
+      }
+    }
   });
 
   // Create a fadeIn animation on that animate object.

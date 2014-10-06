@@ -107,8 +107,8 @@ $().ready(function() {
   // Create an animate object with our canvas.
   var animator = new cAnimator({
     canvas: document.getElementById("mainscreen"),
-    width: 960,
-    height: 600,
+    width: 640,
+    height: 400,
     weight: 102,
   });
   cAnimator.start();
