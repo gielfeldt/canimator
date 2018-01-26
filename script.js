@@ -340,7 +340,7 @@ $().ready(function() {
     starfield[1].start();
     starfield[2].start();
     starfield[3].start();
-    // document.getElementById('music').play();
+    document.getElementById('music').play();
     //while (!dancer.isLoaded());
     // dancer.play();
   });
