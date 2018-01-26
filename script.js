@@ -1,109 +1,28 @@
 
 $().ready(function() {
 
-
-  dancer = new Dancer();
-  
-/*
-  kick = dancer.createKick({
-    frequency: [7, 8],
-    threshold: 0.05,
-    onKick: function () {
-      console.log("Kicking");
-      myFader.start();
-    },
-    offKick: function () {
-      // console.log("Un-Kicking");
-    }
-  });
-*/
-  dancer.onceAt( 0, function () {
-    // kick.on();
-  }).onceAt( 10.2, function () {
-    myFader.start();
-  }).onceAt( 1, function () {
-    // dancer.pause();
-  })
-//    .fft( document.getElementById( 'fft' ) )
-    .load({ src: 'skidrow_fairlight', codecs: [ 'mp3' ]})
-  //  .load({ src: 'zircon_devils_spirit', codecs: [ 'mp3' ]})
-
-
-/*
-  // Create an animate object with our canvas.
-  var animator = new cAnimator({
-    canvas: document.getElementById("mainscreen"),
-    width: 848,
-    height: 480,
-    weight: 2,
-  });
-/*
-  var myText = new cAnimationSinusText({
-//  var myText = new textScroll({
-    animator: animator,
-    text: "cAnimator! The most awesomest canvas animator framework available! Peace y'all!",
-    // margin: myRaster.margin,
-    // quality: 4,
-    // sine: sine[sinePos],
-    quality: 1,
+  var audioStatic = new Audio("tv-static-01.mp3");
+  audioStatic.addEventListener("canplaythrough", function() {
+    console.log("static loaded");
   });
 
-  myText.start();
-
-  HotKey.setChar("f", function() {
-    console.log("fps");
-    if (animator.showStats()) {
-      animator.showStats(false);
-    }
-    else {
-      animator.showStats(30);
-    }
+  var audioMusic = new Audio("skidrow_fairlight.mp3");
+  audioMusic.addEventListener("canplaythrough", function() {
+    console.log("music loaded");
   });
-
-  return;
-*/
 
   var timeTrigger = new TimeTrigger({
     interval: 1000/30,
-    callback: function() { return document.getElementById('music').currentTime; },
+    callback: function() { return audioMusic.currentTime; },
   });
 
   timeTrigger.add({
-    /*
-    1:    function () { myFader.start(); },
-    2:    function () { myFader.start(); },
-    3:    function () { myFader.start(); },
-    4:    function () { myFader.start(); },
-    5:    function () { myFader.start(); },
-    */
     10.2: function () { myFader.start(); },
   });
 
 
   timeTrigger.enable();
-/*
-  // Create an animate object with our canvas.
-  var realScreen = new cAnimator({
-    canvas: document.getElementById("mainscreen"),
-    width: 848,
-    height: 480,
-    weight: 2,
-    pre: function () {
-      this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-      this.canvasCtx.drawImage(tempBuffer.canvas, 0, 0, tempBuffer.canvas.width, tempBuffer.canvas.height, 0, 0, this.canvas.width, this.canvas.height)
-    },
-  });
 
-  var tempBuffer = new cAnimator({
-    canvas: document.createElement("canvas"),
-    width: realScreen.width,
-    height: realScreen.height,
-  });
-
-  var animator = realScreen;
-  animator.pre = function () { this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height) }
-
-/**/
   // Create an animate object with our canvas.
   var animator = new cAnimator({
     canvas: document.getElementById("mainscreen"),
@@ -325,11 +244,11 @@ $().ready(function() {
   });
 
   myStatic.onStart(function () {
-    document.getElementById('static').play();
+    audioStatic.play();
   });
   myStatic.onStop(function () {
-    document.getElementById('static').pause();
-    document.getElementById('static').currentTime = 0;
+    audioStatic.pause();
+    audioStatic.currentTime = 0;
   });
 
   // Start the whole sha-bang.
@@ -340,9 +259,7 @@ $().ready(function() {
     starfield[1].start();
     starfield[2].start();
     starfield[3].start();
-    document.getElementById('music').play();
-    //while (!dancer.isLoaded());
-    // dancer.play();
+    audioMusic.play();
   });
   myFader2.onStop(function () {
     // myFader3.start();
@@ -370,23 +287,6 @@ $().ready(function() {
     }
   }, 1000/30);
 
-
-/*
-  myBlur.onStart(function () {
-    console.log("TEST");
-    var id = setInterval(function() {
-      if (myBlur.strength < 100) {
-        myBlur.setStrength(myBlur.strength * 1.2);
-      }
-      else {
-        console.log("NOBLUR");
-        myBlur.stop();
-        myBlur.setStrength(0);
-        clearInterval(id);
-      }
-    }, 100);
-  });
-*/
   HotKey.setChar(" ", function () {
     console.log("FADER1");
     myFader.start();
@@ -491,10 +391,7 @@ $().ready(function() {
 
   HotKey.setChar("m", function () {
     console.log("stop/start music");
-    // dancer.isPlaying() ? dancer.pause() : dancer.play();
-    // return;
-    var music = document.getElementById('music');
-    music.paused ? music.play() : music.pause();
+    audioMusic.paused ? audioMusic.play() : audioMusic.pause();
   });
   HotKey.setChar("p", function () {
     animator.isRunning() ? animator.stop() : animator.start();
