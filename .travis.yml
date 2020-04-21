@@ -1,9 +1,11 @@
+language: minimal
+
 services:
   - docker
 
-before_install:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+install:
     - docker build -t gielfeldt/canimator:$TRAVIS_BRANCH.$TRAVIS_BUILD_NUMBER -t gielfeldt/canimator:$TRAVIS_BRANCH .
 
 script:
-    - docker push gielfeldt/canimator:$TRAVIS_BRANCH.$TRAVIS_BUILD_NUMBER gielfeldt/canimator:$TRAVIS_BRANCH
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker push gielfeldt/canimator:$TRAVIS_BRANCH.$TRAVIS_BUILD_NUMBER
