@@ -8,4 +8,5 @@ install:
 
 script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker push gielfeldt/canimator:$TRAVIS_BRANCH
     - docker push gielfeldt/canimator:$TRAVIS_BRANCH.$TRAVIS_BUILD_NUMBER
