@@ -1,0 +1,9 @@
+version: '3.5'
+
+services:
+    web:
+        build: ./
+        volumes:
+            - ./:/web/
+        ports:
+            - 8080:8080
